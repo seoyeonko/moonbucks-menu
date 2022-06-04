@@ -1,8 +1,8 @@
 // step1 요구사항 구현을 위한 전략
 // TODO 메뉴 추가
-// - [ ] 메뉴 이름 입력 -> enter 키 입력 추가
-// - [ ] 추가되는 메누 마크업은 `ul#espresso-menu-list` 안에 삽입
-// - [ ] 총 메뉴 개수 count해 상단에 보이기
+// - [x] 메뉴 이름 입력 -> enter 키 입력 추가
+// - [x] 추가되는 메누 마크업은 `ul#espresso-menu-list` 안에 삽입
+// - [x] 총 메뉴 개수 count해 상단에 보이기
 // - [ ] 메뉴 추가시; input 빈 값으로 초기화
 // - [ ] 사용자 입력값이 빈 값; 추가되지 않음
 
@@ -40,6 +40,10 @@ function App() {
         'beforeend',
         menuItemTemplate(espressoMenuName)
       );
+
+      // li 개수 카운팅
+      const menuCount = $('#espresso-menu-list').querySelectorAll('li').length;
+      $('.menu-count').innerText = `총 ${menuCount}개`;
     }
   });
 }
