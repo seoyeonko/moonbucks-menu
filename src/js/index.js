@@ -1,9 +1,9 @@
 // step2 요구사항 분석
 // TODO localStorage Read & Write
-// - [ ] localStorage에 데이터를 저장
-//   - [ ] 메뉴 추가시
-//   - [ ] 메뉴 수정시
-//   - [ ] 메뉴 삭제시
+// - [x] localStorage에 데이터를 저장
+//   - [x] 메뉴 추가시
+//   - [x] 메뉴 수정시
+//   - [x] 메뉴 삭제시
 // - [ ] localStorage에 있는 데이터를 읽어옴 (새로고침해도 데이터가 남아있게)
 
 // TODO 메뉴판 관리
@@ -90,9 +90,12 @@ function App() {
 
   const removeMenuName = (e) => {
     if (confirm('정말 삭제할까요?')) {
+      const menuId = e.target.closest('li').dataset.menuId;
+      this.menu.splice(menuId, 1);
+      store.setLocalStorage(this.menu); // localStorage 삭제 반영
       e.target.closest('li').remove();
+      updateMenuCount();
     }
-    updateMenuCount();
   };
 
   $('#espresso-menu-list').addEventListener('click', (e) => {
