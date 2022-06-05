@@ -10,7 +10,20 @@
 const $ = (selector) => document.querySelector(selector);
 
 function App() {
-  // form 태그가 자동으로 전송되는 것을 막아줌
+  // TODO 메뉴 수정
+  // - [x] 메뉴의 수정 버튼 클릭 이벤트; 메뉴 수정 모달창(prompt)
+  // - [x] 모달창에서 신규 메뉴명 입력; 확인 버튼 클릭 -> 메뉴 수정
+  $('#espresso-menu-list').addEventListener('click', (e) => {
+    if (e.target.classList.contains('menu-edit-button')) {
+      const $menuName = e.target.closest('li').querySelector('.menu-name');
+      const updatedMenuName = prompt(
+        '메뉴명을 수정하세요',
+        $menuName.innerText
+      );
+      $menuName.innerText = updatedMenuName;
+    }
+  });
+
   $('#espresso-menu-form').addEventListener('submit', (e) => {
     e.preventDefault();
   });
@@ -54,7 +67,6 @@ function App() {
     addMenuName();
   });
 
-  // 메뉴 입력 받기
   $('#espresso-menu-name').addEventListener('keypress', (e) => {
     if (e.key !== 'Enter') {
       return;
@@ -64,10 +76,6 @@ function App() {
 }
 
 App();
-
-// TODO 메뉴 수정
-// - [ ] 메뉴의 수정 버튼 클릭 이벤트; 메뉴 수정 모달창
-// - [ ] 모달창에서 신규 메뉴명 입력; 확인 버튼 클릭 -> 메뉴 수정
 
 // TODO 메뉴 삭제
 // - [ ] 메뉴의 삭제 버튼 클릭 이벤트; 메뉴 삭제 컨펌 모달창
