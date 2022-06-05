@@ -79,30 +79,34 @@ function App() {
     $('.menu-count').innerText = `총 ${menuCount}개`;
   };
 
-  const addMenuName = () => {
+  const addMenuName = async () => {
     if ($('#menu-name').value === '') {
       alert('값을 입력해주세요');
       return;
     }
     const menuName = $('#menu-name').value;
 
-    fetch(`${BASE_URL}/category/${this.currentCategory}/menu`, {
+    // 메뉴 추가
+    await fetch(`${BASE_URL}/category/${this.currentCategory}/menu`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ name: menuName }),
-    })
+    }).then((response) => {
+      return response.json();
+    });
+
+    // 전체 메뉴 리스트 (추가된 것 포함)
+    await fetch(`${BASE_URL}/category/${this.currentCategory}/menu`)
       .then((response) => {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
+        this.menu[this.currentCategory] = data; // [ {}, {}, {}, ... ]
+        render();
+        $('#menu-name').value = '';
       });
-    // this.menu[this.currentCategory].push({ name: menuName }); // 상태 값을 로컬스토리지에 저장 -> 상태 변경시 바로 저장
-    store.setLocalStorage(this.menu);
-    render();
-    $('#menu-name').value = '';
   };
 
   const updateMenuName = (e) => {
