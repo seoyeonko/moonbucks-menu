@@ -37,6 +37,8 @@ const store = {
 function App() {
   // 상태 (변하는 데이터): 메뉴명 (개수는 메뉴명으로부터 계산 가능)
   this.menu = [];
+
+  // localStorage에서 데이터를 읽어옴
   this.init = () => {
     if (store.getLocalStorage().length > 1) {
       this.menu = store.getLocalStorage();
@@ -133,4 +135,4 @@ function App() {
 }
 
 const app = new App();
-app.init();
+app.init(); // app이 instance로 띄워짐
