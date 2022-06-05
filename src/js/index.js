@@ -22,17 +22,8 @@
 // - [x] 품절 버튼 클릭시 localStorage에 선택값이 저장
 // - [x] 품절 해당 메뉴의 상태 값이 페이지에 그려짐
 // - [x] 클릭 이벤트에서 가장 가까운 li 태그의 class 속성 값에 sold-out을 추가
-
-const $ = (selector) => document.querySelector(selector);
-
-const store = {
-  setLocalStorage(menu) {
-    localStorage.setItem('menu', JSON.stringify(menu)); // json -> string
-  },
-  getLocalStorage() {
-    return JSON.parse(localStorage.getItem('menu')); // string -> json
-  },
-};
+import { $ } from './utils/dom.js';
+import store from './store/index.js';
 
 function App() {
   // 상태 (변하는 데이터): 메뉴명, 현재 클릭된 카테고리 (개수는 메뉴명으로부터 계산 가능)
@@ -50,6 +41,7 @@ function App() {
       this.menu = store.getLocalStorage();
     }
     render();
+    initEventListeners();
   };
 
   const render = () => {
@@ -88,7 +80,7 @@ function App() {
   };
 
   const updateMenuCount = () => {
-    const menuCount = $('#menu-list').querySelectorAll('li').length;
+    const menuCount = this.menu[this.currentCategory].length;
     $('.menu-count').innerText = `총 ${menuCount}개`;
   };
 
@@ -110,8 +102,8 @@ function App() {
     const $menuName = e.target.closest('li').querySelector('.menu-name');
     const updatedMenuName = prompt('메뉴명을 수정하세요', $menuName.innerText);
     this.menu[this.currentCategory][menuId].name = updatedMenuName; // 이름 수정
-    store.setLocalStorage(this.menu); // localStorage 수정 반영
-    $menuName.innerText = updatedMenuName;
+    store.setLocalStorage(this.menu); // localStorage 수정 반영'
+    render();
   };
 
   const removeMenuName = (e) => {
@@ -119,8 +111,7 @@ function App() {
       const menuId = e.target.closest('li').dataset.menuId;
       this.menu[this.currentCategory].splice(menuId, 1); // 메뉴 삭제: array.splice(idx, n개)
       store.setLocalStorage(this.menu); // localStorage 삭제 반영
-      e.target.closest('li').remove();
-      updateMenuCount();
+      render();
     }
   };
 
@@ -132,46 +123,49 @@ function App() {
     render();
   };
 
-  $('#menu-list').addEventListener('click', (e) => {
-    if (e.target.classList.contains('menu-edit-button')) {
-      updateMenuName(e);
-      return;
-    }
+  const initEventListeners = () => {
+    $('#menu-list').addEventListener('click', (e) => {
+      if (e.target.classList.contains('menu-edit-button')) {
+        updateMenuName(e);
+        return;
+      }
 
-    if (e.target.classList.contains('menu-remove-button')) {
-      removeMenuName(e);
-      return;
-    }
+      if (e.target.classList.contains('menu-remove-button')) {
+        removeMenuName(e);
+        return;
+      }
 
-    if (e.target.classList.contains('menu-sold-out-button')) {
-      soldOutMenu(e);
-      return;
-    }
-  });
+      if (e.target.classList.contains('menu-sold-out-button')) {
+        soldOutMenu(e);
+        return;
+      }
+    });
 
-  $('#menu-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-  });
+    $('#menu-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+    });
 
-  $('#menu-submit-button').addEventListener('click', addMenuName);
+    $('#menu-submit-button').addEventListener('click', addMenuName);
 
-  $('#menu-name').addEventListener('keypress', (e) => {
-    if (e.key !== 'Enter') {
-      return;
-    }
-    addMenuName();
-  });
+    $('#menu-name').addEventListener('keypress', (e) => {
+      if (e.key !== 'Enter') {
+        return;
+      }
+      addMenuName();
+    });
 
-  $('nav').addEventListener('click', (e) => {
-    const isCategoryButton = e.target.classList.contains('cafe-category-name');
-    if (isCategoryButton) {
-      const categoryName = e.target.dataset.categoryName;
-      this.currentCategory = categoryName;
+    $('nav').addEventListener('click', (e) => {
+      const isCategoryButton =
+        e.target.classList.contains('cafe-category-name');
+      if (isCategoryButton) {
+        const categoryName = e.target.dataset.categoryName;
+        this.currentCategory = categoryName;
 
-      $('#category-title').innerText = `${e.target.innerText} 메뉴 관리`;
-      render();
-    }
-  });
+        $('#category-title').innerText = `${e.target.innerText} 메뉴 관리`;
+        render();
+      }
+    });
+  };
 }
 
 const app = new App();
