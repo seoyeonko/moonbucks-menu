@@ -1,6 +1,9 @@
 // step2 요구사항 분석
 // TODO localStorage Read & Write
 // - [ ] localStorage에 데이터를 저장
+//   - [ ] 메뉴 추가시
+//   - [ ] 메뉴 수정시
+//   - [ ] 메뉴 삭제시
 // - [ ] localStorage에 있는 데이터를 읽어옴 (새로고침해도 데이터가 남아있게)
 
 // TODO 메뉴판 관리
@@ -50,9 +53,9 @@ function App() {
     this.menu.push({ name: espressoMenuName }); // 상태 값을 로컬스토리지에 저장 -> 상태 변경시 바로 저장
     store.setLocalStorage(this.menu);
     const template = this.menu
-      .map((item) => {
-        return `<li class="menu-list-item d-flex items-center py-2">
-        <span class="w-100 pl-2 menu-name">${item.name}</span>
+      .map((menuItem, index) => {
+        return `<li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
+        <span class="w-100 pl-2 menu-name">${menuItem.name}</span>
         <button
           type="button"
           class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
@@ -77,8 +80,11 @@ function App() {
   };
 
   const updateMenuName = (e) => {
+    const menuId = e.target.closest('li').dataset.menuId;
     const $menuName = e.target.closest('li').querySelector('.menu-name');
     const updatedMenuName = prompt('메뉴명을 수정하세요', $menuName.innerText);
+    this.menu[menuId].name = updatedMenuName; // 이름 수정
+    store.setLocalStorage(this.menu); // localStorage 수정 반영
     $menuName.innerText = updatedMenuName;
   };
 
