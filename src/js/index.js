@@ -4,7 +4,7 @@ import store from './store/index.js';
 // step3
 // TODO 서버 요청 부분
 // - [x] 웹 서버를 띄운다.
-// - [ ] 서버에 새로운 메뉴명이 추가될 수 있도록 요청
+// - [x] 서버에 새로운 메뉴명이 추가될 수 있도록 요청
 // - [ ] 카테고리별 메뉴 리스트를 불러옴
 // - [ ] 서버에 메뉴가 수정될 수 있도록 요청
 // - [ ] 서버에 메뉴의 품절 상태가 토글될 수 있도록 요청
@@ -24,6 +24,19 @@ const MenuApi = {
   async getAllMenuByCategory(category) {
     const response = await fetch(`${BASE_URL}/category/${category}/menu`);
     return response.json();
+  },
+  // 메뉴 추가
+  async createMenu(category, name) {
+    const response = await fetch(`${BASE_URL}/category/${category}/menu`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name }), // name: name
+    });
+    if (!response.ok) {
+      console.error('에러가 발생했습니다', response);
+    }
   },
 };
 
@@ -47,6 +60,7 @@ function App() {
   };
 
   const render = () => {
+    // this.menu[this.currentCategory]에 데이터를 바인딩해야 반영됨
     const template = this.menu[this.currentCategory]
       .map((menuItem, index) => {
         return `<li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
@@ -93,17 +107,9 @@ function App() {
     }
     const menuName = $('#menu-name').value;
 
-    // 메뉴 추가
-    await fetch(`${BASE_URL}/category/${this.currentCategory}/menu`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name: menuName }),
-    }).then((response) => {
-      return response.json();
-    });
-
+    // 1. 메뉴 추가
+    await MenuApi.createMenu(this.currentCategory, menuName);
+    // 2. 전체 메뉴 불러오기 (추가된 메뉴 포함)
     this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
       this.currentCategory
     );
@@ -168,14 +174,17 @@ function App() {
       addMenuName();
     });
 
-    $('nav').addEventListener('click', (e) => {
+    $('nav').addEventListener('click', async (e) => {
       const isCategoryButton =
         e.target.classList.contains('cafe-category-name');
       if (isCategoryButton) {
         const categoryName = e.target.dataset.categoryName;
         this.currentCategory = categoryName;
-
         $('#category-title').innerText = `${e.target.innerText} 메뉴 관리`;
+        // 전체 메뉴 블러오기
+        this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+          this.currentCategory
+        );
         render();
       }
     });
