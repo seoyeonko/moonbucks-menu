@@ -8,9 +8,9 @@ import store from './store/index.js';
 // - [x] 카테고리별 메뉴 리스트를 불러옴
 // - [x] 서버에 메뉴가 수정될 수 있도록 요청
 // - [x] 서버에 메뉴의 품절 상태가 토글될 수 있도록 요청
-// - [ ] 서버에 메뉴가 삭제될 수 있도록 요청
+// - [x] 서버에 메뉴가 삭제될 수 있도록 요청
 
-// TODO 리팰터링 부분
+// TODO 리팩터링 부분
 // - [ ] localStorage에 저장하는 로직은 지운다.
 // - [ ] fetch 비동기 api를 사용하는 부분을 async await을 사용하여 구현한다.
 
@@ -61,10 +61,18 @@ const MenuApi = {
       `${BASE_URL}/category/${category}/menu/${menuId}/soldout`,
       {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name }),
+      }
+    );
+    if (!response.ok) {
+      console.error('에러가 발생했습니다', response);
+    }
+  },
+  // 메뉴 삭제
+  async deleteMenu(category, menuId) {
+    const response = await fetch(
+      `${BASE_URL}/category/${category}/menu/${menuId}`,
+      {
+        method: 'DELETE',
       }
     );
     if (!response.ok) {
@@ -167,11 +175,15 @@ function App() {
     render();
   };
 
-  const removeMenuName = (e) => {
+  const removeMenuName = async (e) => {
     if (confirm('정말 삭제할까요?')) {
       const menuId = e.target.closest('li').dataset.menuId;
-      this.menu[this.currentCategory].splice(menuId, 1); // 메뉴 삭제: array.splice(idx, n개)
-      store.setLocalStorage(this.menu); // localStorage 삭제 반영
+      // 1. 메뉴 삭제
+      await MenuApi.deleteMenu(this.currentCategory, menuId);
+      // 2. 전체 메뉴 불러오기 (삭제된 메뉴 반영)
+      this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+        this.currentCategory
+      );
       render();
     }
   };
