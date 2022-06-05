@@ -1,63 +1,79 @@
 const BASE_URL = 'http://localhost:3000/api';
-const MenuApi = {
-  // 전체 메뉴 가져옴
-  async getAllMenuByCategory(category) {
-    const response = await fetch(`${BASE_URL}/category/${category}/menu`);
-    return response.json();
-  },
-  // 메뉴 추가
-  async createMenu(category, name) {
-    const response = await fetch(`${BASE_URL}/category/${category}/menu`, {
+
+const HTTP_METHOD = {
+  POST(data) {
+    return {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name }), // name: name
-    });
-    if (!response.ok) {
-      console.error('에러가 발생했습니다', response);
-    }
+      body: JSON.stringify(data), // data: data
+    };
   },
-  // 메뉴 수정
+  PUT(data) {
+    return {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: data ? JSON.stringify(data) : null,
+    };
+  },
+  DELETE() {
+    return {
+      method: 'DELETE',
+    };
+  },
+};
+
+const request = async (url, option) => {
+  const response = await fetch(url, option);
+  if (!response.ok) {
+    alert('❌ 에러가 발생했습니다! ❌');
+    console.error('에러가 발생했습니다', e);
+  }
+  return response.json();
+  // delete의 경우, 응답값(데이터)이 없는데 json형식으로 parsing 하려는 경우 syntax error 발생
+  // 서버 요청시 어떤 요청을 데이터를 내려주는데, 어떤 요청에 대해서는 데이터 없이 ok 사인만 내려주는 경우도 있음
+  // -> requestWithoutJson() 에서 해결
+};
+
+const requestWithoutJson = async (url, option) => {
+  const response = await fetch(url, option);
+  if (!response.ok) {
+    alert('❌ 에러가 발생했습니다! ❌');
+    console.error('에러가 발생했습니다', e);
+  }
+  return response;
+};
+
+const MenuApi = {
+  async getAllMenuByCategory(category) {
+    return request(`${BASE_URL}/category/${category}/menu`);
+  },
+  async createMenu(category, name) {
+    return request(
+      `${BASE_URL}/category/${category}/menu`,
+      HTTP_METHOD.POST({ name })
+    );
+  },
   async updateMenu(category, name, menuId) {
-    const response = await fetch(
+    return request(
       `${BASE_URL}/category/${category}/menu/${menuId}`,
-      {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name }),
-      }
+      HTTP_METHOD.PUT({ name })
     );
-    if (!response.ok) {
-      console.error('에러가 발생했습니다', response);
-    }
-    return response.json();
   },
-  // 메뉴 품절 처리
   async toggleSoldOutMenu(category, menuId) {
-    const response = await fetch(
+    return request(
       `${BASE_URL}/category/${category}/menu/${menuId}/soldout`,
-      {
-        method: 'PUT',
-      }
+      HTTP_METHOD.PUT()
     );
-    if (!response.ok) {
-      console.error('에러가 발생했습니다', response);
-    }
   },
-  // 메뉴 삭제
   async deleteMenu(category, menuId) {
-    const response = await fetch(
+    return requestWithoutJson(
       `${BASE_URL}/category/${category}/menu/${menuId}`,
-      {
-        method: 'DELETE',
-      }
+      HTTP_METHOD.DELETE()
     );
-    if (!response.ok) {
-      console.error('에러가 발생했습니다', response);
-    }
   },
 };
 
