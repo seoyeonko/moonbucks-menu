@@ -3,7 +3,7 @@
 // - [x] 메뉴 이름 입력 -> enter 키 입력 추가
 // - [x] 추가되는 메누 마크업은 `ul#espresso-menu-list` 안에 삽입
 // - [x] 총 메뉴 개수 count해 상단에 보이기
-// - [ ] 메뉴 추가시; input 빈 값으로 초기화
+// - [x] 메뉴 추가시; input 빈 값으로 초기화
 // - [ ] 사용자 입력값이 빈 값; 추가되지 않음
 
 const $ = (selector) => document.querySelector(selector);
@@ -16,6 +16,15 @@ function App() {
 
   // 메뉴 입력 받기
   $('#espresso-menu-name').addEventListener('keypress', (e) => {
+    if (e.key !== 'Enter') {
+      return;
+    }
+
+    if ($('#espresso-menu-name').value === '') {
+      alert('값을 입력해주세요');
+      return;
+    }
+
     if (e.key === 'Enter') {
       const espressoMenuName = $('#espresso-menu-name').value;
       const menuItemTemplate = (espressoMenuName) => {
@@ -44,6 +53,9 @@ function App() {
       // li 개수 카운팅
       const menuCount = $('#espresso-menu-list').querySelectorAll('li').length;
       $('.menu-count').innerText = `총 ${menuCount}개`;
+
+      // 메뉴 추가시; input 초기화
+      $('#espresso-menu-name').value = '';
     }
   });
 }
