@@ -19,6 +19,13 @@ import store from './store/index.js';
 // - [ ] 중복되는 메뉴는 추가할 수 없다.
 
 const BASE_URL = 'http://localhost:3000/api';
+const MenuApi = {
+  // 전체 메뉴 가져옴
+  async getAllMenuByCategory(category) {
+    const response = await fetch(`${BASE_URL}/category/${category}/menu`);
+    return response.json();
+  },
+};
 
 function App() {
   // 상태 (변하는 데이터): 메뉴명, 현재 클릭된 카테고리 (개수는 메뉴명으로부터 계산 가능)
@@ -31,10 +38,10 @@ function App() {
   };
   this.currentCategory = 'espresso';
   // localStorage에서 데이터를 읽어옴
-  this.init = () => {
-    if (store.getLocalStorage()) {
-      this.menu = store.getLocalStorage();
-    }
+  this.init = async () => {
+    this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+      this.currentCategory
+    ); // [ {}, {}, {}, ... ]
     render();
     initEventListeners();
   };
@@ -97,16 +104,11 @@ function App() {
       return response.json();
     });
 
-    // 전체 메뉴 리스트 (추가된 것 포함)
-    await fetch(`${BASE_URL}/category/${this.currentCategory}/menu`)
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        this.menu[this.currentCategory] = data; // [ {}, {}, {}, ... ]
-        render();
-        $('#menu-name').value = '';
-      });
+    this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+      this.currentCategory
+    );
+    render();
+    $('#menu-name').value = '';
   };
 
   const updateMenuName = (e) => {
