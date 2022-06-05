@@ -3,7 +3,7 @@ import store from './store/index.js';
 
 // step3
 // TODO 서버 요청 부분
-// - [ ] 웹 서버를 띄운다.
+// - [x] 웹 서버를 띄운다.
 // - [ ] 서버에 새로운 메뉴명이 추가될 수 있도록 요청
 // - [ ] 카테고리별 메뉴 리스트를 불러옴
 // - [ ] 서버에 메뉴가 수정될 수 있도록 요청
@@ -17,6 +17,8 @@ import store from './store/index.js';
 // TODO 사용자 경험
 // - [ ] API 통신이 실패하는 경우에 대해 사용자가 알 수 있게 alert으로 예외처리를 진행한다.
 // - [ ] 중복되는 메뉴는 추가할 수 없다.
+
+const BASE_URL = 'http://localhost:3000/api';
 
 function App() {
   // 상태 (변하는 데이터): 메뉴명, 현재 클릭된 카테고리 (개수는 메뉴명으로부터 계산 가능)
@@ -82,9 +84,22 @@ function App() {
       alert('값을 입력해주세요');
       return;
     }
-
     const menuName = $('#menu-name').value;
-    this.menu[this.currentCategory].push({ name: menuName }); // 상태 값을 로컬스토리지에 저장 -> 상태 변경시 바로 저장
+
+    fetch(`${BASE_URL}/category/${this.currentCategory}/menu`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name: menuName }),
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+      });
+    // this.menu[this.currentCategory].push({ name: menuName }); // 상태 값을 로컬스토리지에 저장 -> 상태 변경시 바로 저장
     store.setLocalStorage(this.menu);
     render();
     $('#menu-name').value = '';
