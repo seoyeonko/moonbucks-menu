@@ -33,6 +33,8 @@ const store = {
 
 function App() {
   // 상태 (변하는 데이터): 메뉴명 (개수는 메뉴명으로부터 계산 가능)
+  this.menu = [];
+
   const updateMenuCount = () => {
     const menuCount = $('#espresso-menu-list').querySelectorAll('li').length;
     $('.menu-count').innerText = `총 ${menuCount}개`;
@@ -45,9 +47,12 @@ function App() {
     }
 
     const espressoMenuName = $('#espresso-menu-name').value;
-    const menuItemTemplate = (espressoMenuName) => {
-      return `<li class="menu-list-item d-flex items-center py-2">
-        <span class="w-100 pl-2 menu-name">${espressoMenuName}</span>
+    this.menu.push({ name: espressoMenuName }); // 상태 값을 로컬스토리지에 저장 -> 상태 변경시 바로 저장
+    store.setLocalStorage(this.menu);
+    const template = this.menu
+      .map((item) => {
+        return `<li class="menu-list-item d-flex items-center py-2">
+        <span class="w-100 pl-2 menu-name">${item.name}</span>
         <button
           type="button"
           class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
@@ -61,12 +66,12 @@ function App() {
           삭제
         </button>
       </li>`;
-    };
+      })
+      .join(''); // 배열 형태로 된 li 태그들을 하나의 문자열 마크업으로
+    // map(): ['<li></li>', '<li></li>', ... ]
+    // join(''): <li></li><li></li>...
 
-    $('#espresso-menu-list').insertAdjacentHTML(
-      'beforeend',
-      menuItemTemplate(espressoMenuName)
-    );
+    $('#espresso-menu-list').innerHTML = template;
     updateMenuCount();
     $('#espresso-menu-name').value = '';
   };
@@ -108,4 +113,4 @@ function App() {
   });
 }
 
-App();
+const app = new App();
