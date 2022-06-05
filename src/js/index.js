@@ -4,7 +4,7 @@
 //   - [x] 메뉴 추가시
 //   - [x] 메뉴 수정시
 //   - [x] 메뉴 삭제시
-// - [ ] localStorage에 있는 데이터를 읽어옴 (새로고침해도 데이터가 남아있게)
+// - [x] localStorage에 있는 데이터를 읽어옴 (새로고침해도 데이터가 남아있게)
 
 // TODO 메뉴판 관리
 // - [ ] 에스프레소 메뉴판 관리
@@ -30,13 +30,46 @@ const store = {
     localStorage.setItem('menu', JSON.stringify(menu)); // json -> string
   },
   getLocalStorage() {
-    localStorage.getItem('menu');
+    return JSON.parse(localStorage.getItem('menu')); // string -> json
   },
 };
 
 function App() {
   // 상태 (변하는 데이터): 메뉴명 (개수는 메뉴명으로부터 계산 가능)
   this.menu = [];
+  this.init = () => {
+    if (store.getLocalStorage().length > 1) {
+      this.menu = store.getLocalStorage();
+    }
+    render();
+  };
+
+  const render = () => {
+    const template = this.menu
+      .map((menuItem, index) => {
+        return `<li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
+      <span class="w-100 pl-2 menu-name">${menuItem.name}</span>
+      <button
+        type="button"
+        class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
+      >
+        수정
+      </button>
+      <button
+        type="button"
+        class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
+      >
+        삭제
+      </button>
+    </li>`;
+      })
+      .join(''); // 배열 형태로 된 li 태그들을 하나의 문자열 마크업으로
+    // map(): ['<li></li>', '<li></li>', ... ]
+    // join(''): <li></li><li></li>...
+
+    $('#espresso-menu-list').innerHTML = template;
+    updateMenuCount();
+  };
 
   const updateMenuCount = () => {
     const menuCount = $('#espresso-menu-list').querySelectorAll('li').length;
@@ -52,30 +85,7 @@ function App() {
     const espressoMenuName = $('#espresso-menu-name').value;
     this.menu.push({ name: espressoMenuName }); // 상태 값을 로컬스토리지에 저장 -> 상태 변경시 바로 저장
     store.setLocalStorage(this.menu);
-    const template = this.menu
-      .map((menuItem, index) => {
-        return `<li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
-        <span class="w-100 pl-2 menu-name">${menuItem.name}</span>
-        <button
-          type="button"
-          class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
-        >
-          수정
-        </button>
-        <button
-          type="button"
-          class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
-        >
-          삭제
-        </button>
-      </li>`;
-      })
-      .join(''); // 배열 형태로 된 li 태그들을 하나의 문자열 마크업으로
-    // map(): ['<li></li>', '<li></li>', ... ]
-    // join(''): <li></li><li></li>...
-
-    $('#espresso-menu-list').innerHTML = template;
-    updateMenuCount();
+    render();
     $('#espresso-menu-name').value = '';
   };
 
@@ -91,7 +101,7 @@ function App() {
   const removeMenuName = (e) => {
     if (confirm('정말 삭제할까요?')) {
       const menuId = e.target.closest('li').dataset.menuId;
-      this.menu.splice(menuId, 1);
+      this.menu.splice(menuId, 1); // 메뉴 삭제: array.splice(idx, n개)
       store.setLocalStorage(this.menu); // localStorage 삭제 반영
       e.target.closest('li').remove();
       updateMenuCount();
@@ -123,3 +133,4 @@ function App() {
 }
 
 const app = new App();
+app.init();
