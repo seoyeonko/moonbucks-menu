@@ -1,27 +1,3 @@
-// step2 요구사항 분석
-// TODO localStorage Read & Write
-// - [x] localStorage에 데이터를 저장
-//   - [x] 메뉴 추가시
-//   - [x] 메뉴 수정시
-//   - [x] 메뉴 삭제시
-// - [x] localStorage에 있는 데이터를 읽어옴 (새로고침해도 데이터가 남아있게)
-
-// TODO 메뉴판 관리
-// - [x] 에스프레소 메뉴판 관리
-// - [x] 프라푸치노 메뉴판 관리
-// - [x] 블렌디드 메뉴판 관리
-// - [x] 티바나 메뉴판 관리
-// - [x] 디저트 메뉴판 관리
-
-// TODO 페이지 접근시 최초 데이터 Read & Rendering
-// - [x] 페이지에 최초로 로딩될 때 localStorage에 에스프레소 메뉴를 읽어옴
-// - [x] 에스프레소 메뉴를 페이지에 그려줌
-
-// TODO 품절 상태 관리
-// - [x] 품절 버튼 추가
-// - [x] 품절 버튼 클릭시 localStorage에 선택값이 저장
-// - [x] 품절 해당 메뉴의 상태 값이 페이지에 그려짐
-// - [x] 클릭 이벤트에서 가장 가까운 li 태그의 class 속성 값에 sold-out을 추가
 import { $ } from './utils/dom.js';
 import store from './store/index.js';
 
