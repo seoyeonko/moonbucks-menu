@@ -5,8 +5,8 @@ import store from './store/index.js';
 // TODO 서버 요청 부분
 // - [x] 웹 서버를 띄운다.
 // - [x] 서버에 새로운 메뉴명이 추가될 수 있도록 요청
-// - [ ] 카테고리별 메뉴 리스트를 불러옴
-// - [ ] 서버에 메뉴가 수정될 수 있도록 요청
+// - [x] 카테고리별 메뉴 리스트를 불러옴
+// - [x] 서버에 메뉴가 수정될 수 있도록 요청
 // - [ ] 서버에 메뉴의 품절 상태가 토글될 수 있도록 요청
 // - [ ] 서버에 메뉴가 삭제될 수 있도록 요청
 
@@ -38,6 +38,23 @@ const MenuApi = {
       console.error('에러가 발생했습니다', response);
     }
   },
+  // 메뉴 수정
+  async updateMenu(category, name, menuId) {
+    const response = await fetch(
+      `${BASE_URL}/category/${category}/menu/${menuId}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name }),
+      }
+    );
+    if (!response.ok) {
+      console.error('에러가 발생했습니다', response);
+    }
+    return response.json();
+  },
 };
 
 function App() {
@@ -63,7 +80,9 @@ function App() {
     // this.menu[this.currentCategory]에 데이터를 바인딩해야 반영됨
     const template = this.menu[this.currentCategory]
       .map((menuItem, index) => {
-        return `<li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
+        return `<li data-menu-id="${
+          menuItem.id
+        }" class="menu-list-item d-flex items-center py-2">
       <span class="w-100 pl-2 menu-name ${
         menuItem.soldOut ? 'sold-out' : ''
       }">${menuItem.name}</span>
@@ -117,12 +136,18 @@ function App() {
     $('#menu-name').value = '';
   };
 
-  const updateMenuName = (e) => {
+  const updateMenuName = async (e) => {
     const menuId = e.target.closest('li').dataset.menuId;
     const $menuName = e.target.closest('li').querySelector('.menu-name');
     const updatedMenuName = prompt('메뉴명을 수정하세요', $menuName.innerText);
-    this.menu[this.currentCategory][menuId].name = updatedMenuName; // 이름 수정
-    store.setLocalStorage(this.menu); // localStorage 수정 반영'
+    // 1. 메뉴 수정
+    await MenuApi.updateMenu(this.currentCategory, updatedMenuName, menuId);
+    // 2. 전체 메뉴 불러오기 (수정된 메뉴 포함)
+    this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+      this.currentCategory
+    );
+    // this.menu[this.currentCategory][menuId].name = updatedMenuName; // 이름 수정
+    // store.setLocalStorage(this.menu); // localStorage 수정 반영'
     render();
   };
 
