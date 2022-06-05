@@ -22,7 +22,17 @@
 
 const $ = (selector) => document.querySelector(selector);
 
+const store = {
+  setLocalStorage(menu) {
+    localStorage.setItem('menu', JSON.stringify(menu)); // json -> string
+  },
+  getLocalStorage() {
+    localStorage.getItem('menu');
+  },
+};
+
 function App() {
+  // 상태 (변하는 데이터): 메뉴명 (개수는 메뉴명으로부터 계산 가능)
   const updateMenuCount = () => {
     const menuCount = $('#espresso-menu-list').querySelectorAll('li').length;
     $('.menu-count').innerText = `총 ${menuCount}개`;
